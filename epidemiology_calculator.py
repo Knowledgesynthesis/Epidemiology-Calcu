@@ -109,7 +109,7 @@ st.subheader("Key Measures")
 measures = [
     ("OR (Odds Ratio)", "OR = (a * d) / (b * c)", calculations['or']),
     ("RR (Relative Risk)", "RR = (Incidence among exposed) / (Incidence among unexposed)", calculations['rr']),
-    ("RD (Risk Difference)", "RD = (Incidence among exposed) - (Incidence among unexposed)", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
+    ("RD (Risk Difference)", "RD = (Incidence among exposed) - (Incidence among unexposed)", f"{calculations['rd']}      {{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}"),
     ("ARR (Absolute Risk Reduction)", "ARR = (Incidence among unexposed) - (Incidence among exposed)", calculations['arr']),
     ("***Harmful Exposure (e.g. risk factor) or when RD is +:***", "", ""),
     ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", "ARP = [(Incidence among exposed) - (Incidence among unexposed)] / (Incidence among exposed)", calculations['arp']),
@@ -121,7 +121,7 @@ measures = [
 ]
 
 for measure in measures:
-    if len(measure) == 3:
+    if len(measure) == 3 and measure[1] and measure[2]:
         st.markdown(f"**{measure[0]}**:")
         st.markdown(f"Formula: {measure[1]}")
         st.markdown(f"Value: {measure[2]}")
