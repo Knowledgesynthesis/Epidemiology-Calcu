@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import altair as alt
 
-st.set_page_config(layout="centered")
+st.set_page_config(layout="wide")
 st.title("Epidemiology Calculator")
 
 # Default data
@@ -15,36 +15,36 @@ data = {
 # Input fields in table layout
 st.subheader("2x2 Table")
 
-table_data = [
-    ["Exposed", st.number_input("Exposed - Disease", value=data['exposed']['disease'], key="exposed_disease"), 
-               st.number_input("Exposed - No Disease", value=data['exposed']['noDisease'], key="exposed_no_disease"), 0],
-    ["Unexposed", st.number_input("Unexposed - Disease", value=data['unexposed']['disease'], key="unexposed_disease"), 
-                 st.number_input("Unexposed - No Disease", value=data['unexposed']['noDisease'], key="unexposed_no_disease"), 0]
-]
+table_col1, table_col2 = st.columns([2, 1])
 
-# Calculate totals for each row
-for row in table_data:
-    row[3] = row[1] + row[2]
+with table_col1:
+    st.write("### Input Table")
+    st.write("")
+    st.write("")
 
-# Calculate column totals
-total_disease = table_data[0][1] + table_data[1][1]
-total_no_disease = table_data[0][2] + table_data[1][2]
-total_total = table_data[0][3] + table_data[1][3]
+    data['exposed']['disease'] = st.number_input("Exposed - Disease", value=data['exposed']['disease'], key="exposed_disease")
+    data['exposed']['noDisease'] = st.number_input("Exposed - No Disease", value=data['exposed']['noDisease'], key="exposed_no_disease")
+    data['unexposed']['disease'] = st.number_input("Unexposed - Disease", value=data['unexposed']['disease'], key="unexposed_disease")
+    data['unexposed']['noDisease'] = st.number_input("Unexposed - No Disease", value=data['unexposed']['noDisease'], key="unexposed_no_disease")
 
-# Display the input table
-st.write("### Input Table")
-st.write(pd.DataFrame(table_data, columns=["", "Disease", "No Disease", "Total"]))
+    # Calculate totals for each row
+    total_exposed = data['exposed']['disease'] + data['exposed']['noDisease']
+    total_unexposed = data['unexposed']['disease'] + data['unexposed']['noDisease']
 
-# Calculate summary table data
-summary_data = pd.DataFrame({
-    '': ['Exposed', 'Unexposed', 'Total'],
-    'Disease': [table_data[0][1], table_data[1][1], total_disease],
-    'No Disease': [table_data[0][2], table_data[1][2], total_no_disease],
-    'Total': [table_data[0][3], table_data[1][3], total_total]
-})
+    # Calculate column totals
+    total_disease = data['exposed']['disease'] + data['unexposed']['disease']
+    total_no_disease = data['exposed']['noDisease'] + data['unexposed']['noDisease']
+    grand_total = total_exposed + total_unexposed
 
-st.write("### Table Summary")
-st.write(summary_data)
+with table_col2:
+    st.write("### Table Summary")
+    table_data = pd.DataFrame({
+        '': ['Exposed', 'Unexposed', 'Total'],
+        'Disease': [data['exposed']['disease'], data['unexposed']['disease'], total_disease],
+        'No Disease': [data['exposed']['noDisease'], data['unexposed']['noDisease'], total_no_disease],
+        'Total': [total_exposed, total_unexposed, grand_total]
+    })
+    st.table(table_data)
 
 def calculate_measures(data):
     a = data['exposed']['disease']
@@ -73,30 +73,22 @@ def calculate_measures(data):
     nnh = -nnt if rd != 0 else np.inf
 
     return {
-        'or': round(or_ratio, 2), 
-        'rr': round(rr, 2), 
-        'rd': round(rd, 2), 
-        'arr': arr, 
-        'arp': arp, 
-        'pf': pf, 
-        'rrr': rrr, 
-        'nnt': nnt, 
-        'nnh': nnh,
-        'incidence': incidence * 100,
-        'incidence_exposed': incidence_exposed * 100,
-        'incidence_unexposed': incidence_unexposed * 100,
+        'or': round(or_ratio, 3), 
+        'rr': round(rr, 3), 
+        'rd': round(rd, 3), 
+        'arr': round(arr, 3), 
+        'arp': round(arp, 3), 
+        'pf': round(pf, 3), 
+        'rrr': round(rrr, 3), 
+        'nnt': round(nnt, 3), 
+        'nnh': round(nnh, 3),
+        'incidence': round(incidence * 100, 3),
+        'incidence_exposed': round(incidence_exposed * 100, 3),
+        'incidence_unexposed': round(incidence_unexposed * 100, 3),
     }
 
 # Update data dictionary with user inputs
-data['exposed']['disease'] = table_data[0][1]
-data['exposed']['noDisease'] = table_data[0][2]
-data['unexposed']['disease'] = table_data[1][1]
-data['unexposed']['noDisease'] = table_data[1][2]
-
 calculations = calculate_measures(data)
-
-def format_number(num):
-    return f"{num:.2f}" if np.isfinite(num) else 'N/A'
 
 incidence_data = pd.DataFrame([
     {'name': 'Exposed', 'value': calculations['incidence_exposed']},
@@ -118,12 +110,12 @@ measures = [
     ("RR (Relative Risk)", calculations['rr']),
     ("OR (Odds Ratio)", calculations['or']),
     ("RD (Risk Difference)", calculations['rd']),
-    ("ARR (Absolute Risk Reduction)", f"{format_number(calculations['arr'])}%"),
-    ("RRR (Relative Risk Reduction)", f"{format_number(calculations['rrr'])}%"),
-    ("NNT (Number Needed to Treat)", format_number(calculations['nnt'])),
-    ("NNH (Number Needed to Harm)", format_number(calculations['nnh'])),
-    ("AR% (Attributable Risk Percent)", f"{format_number(calculations['arp'])}%"),
-    ("PF (Preventive Fraction)", f"{format_number(calculations['pf'])}%"),
+    ("ARR (Absolute Risk Reduction)", calculations['arr']),
+    ("RRR (Relative Risk Reduction)", calculations['rrr']),
+    ("NNT (Number Needed to Treat)", calculations['nnt']),
+    ("NNH (Number Needed to Harm)", calculations['nnh']),
+    ("AR% (Attributable Risk Percent)", calculations['arp']),
+    ("PF (Preventive Fraction)", calculations['pf']),
 ]
 
 for name, value in measures:
