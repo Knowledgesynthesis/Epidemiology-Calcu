@@ -108,23 +108,17 @@ st.altair_chart(bar_chart, use_container_width=True)
 st.subheader("Key Measures")
 measures = [
     ("OR (Odds Ratio)", "OR = (a * d) / (b * c)", calculations['or']),
-    ("RR (Relative Risk)", "RR = (a / (a + b)) / (c / (c + d))", calculations['rr']),
-    ("RD (Risk Difference)", "RD = (a / (a + b)) - (c / (c + d))", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
-    ("ARR (Absolute Risk Reduction)", "ARR = H5 - H4", calculations['arr']),
+    ("RR (Relative Risk)", "RR = (Incidence among exposed) / (Incidence among unexposed)", calculations['rr']),
+    ("RD (Risk Difference)", "RD = (Incidence among exposed) - (Incidence among unexposed)", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
+    ("ARR (Absolute Risk Reduction)", "ARR = (Incidence among unexposed) - (Incidence among exposed)", calculations['arr']),
     ("***Harmful Exposure (e.g. risk factor) or when RD is +:***", "", ""),
-    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", "ARP = (H4 - H5) / H4", calculations['arp']),
+    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", "ARP = [(Incidence among exposed) - (Incidence among unexposed)] / (Incidence among exposed)", calculations['arp']),
     ("***Preventive Exposure (e.g. treatment) or when RD is -:***", "", ""),
-    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", "PF = (H5 - H4) / H5", calculations['pf']),
-    ("RRR (Relative Risk Reduction)", "RRR = 1 - H6", calculations['rrr']),
-    ("***Number needed to treat (NNT)***", "NNT = 1 / (H5 - H4)", calculations['nnt']),
-    ("***Number needed to harm (NNH)***", "NNH = 1 / (H4 - H5)", calculations['nnh']),
+    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", "PF = [(Incidence among unexposed) - (Incidence among exposed)] / (Incidence among unexposed)", calculations['pf']),
+    ("RRR (Relative Risk Reduction)", "RRR = 1 - RR", calculations['rrr']),
+    ("***Number needed to treat (NNT)***", "NNT = 1 / [(Incidence among unexposed) - (Incidence among exposed)]", calculations['nnt']),
+    ("***Number needed to harm (NNH)***", "NNH = 1 / [(Incidence among exposed) - (Incidence among unexposed)]", calculations['nnh']),
 ]
-
-st.markdown("***where:***")
-st.markdown("***H4 = Incidence among exposed***")
-st.markdown("***H5 = Incidence among unexposed***")
-st.markdown("***H6 = Relative Risk / Risk Ratio (RR)***")
-st.write("")
 
 for measure in measures:
     if len(measure) == 3:
