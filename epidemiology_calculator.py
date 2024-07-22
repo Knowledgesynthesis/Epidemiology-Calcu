@@ -20,11 +20,6 @@ st.subheader("2x2 Table")
 table_col1, table_col2, table_col3 = st.columns([1, 2, 1])
 
 with table_col2:
-    st.write("")
-    st.write("Exposed/Treated")
-    st.write("Unexposed/Control")
-
-with table_col2:
     st.write("### Input Table")
     st.write("")
 
@@ -115,17 +110,19 @@ measures = [
     ("RR (Relative Risk)", calculations['rr']),
     ("OR (Odds Ratio)", calculations['or']),
     ("RD (Risk Difference)", calculations['rd']),
+    ("(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure", ""),
     ("ARR (Absolute Risk Reduction)", calculations['arr']),
+    ("Harmful Exposure (e.g. risk factor) or when RD is +", ""),
+    ("AR% (Attributable Risk Percent)", calculations['arp']),
+    ("Preventive Exposure (e.g. treatment) or when RD is -", ""),
+    ("PF (Preventive Fraction)", calculations['pf']),
     ("RRR (Relative Risk Reduction)", calculations['rrr']),
     ("NNT (Number Needed to Treat)", calculations['nnt']),
     ("NNH (Number Needed to Harm)", calculations['nnh']),
-    ("AR% (Attributable Risk Percent)", calculations['arp']),
-    ("PF (Preventive Fraction)", calculations['pf']),
 ]
 
 for name, value in measures:
-    st.write(f"**{name}:** {value}")
-
-st.write("**Harmful Exposure (e.g. risk factor) or when RD is +**")
-st.write("**Preventive Exposure (e.g. treatment) or when RD is -**")
-st.write("**(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure**")
+    if value:
+        st.write(f"**{name}:** {value}")
+    else:
+        st.write(f"**{name}**")
