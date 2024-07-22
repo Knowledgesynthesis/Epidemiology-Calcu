@@ -110,12 +110,12 @@ measures = [
     ("RR (Relative Risk)", calculations['rr']),
     ("OR (Odds Ratio)", calculations['or']),
     ("RD (Risk Difference)", calculations['rd']),
-    ("(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure", ""),
+    ("_**(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure**_", ""),
     ("ARR (Absolute Risk Reduction)", calculations['arr']),
-    ("Harmful Exposure (e.g. risk factor) or when RD is +", ""),
-    ("AR% (Attributable Risk Percent)", calculations['arp']),
-    ("Preventive Exposure (e.g. treatment) or when RD is -", ""),
-    ("PF (Preventive Fraction)", calculations['pf']),
+    ("_**Harmful Exposure (e.g. risk factor) or when RD is +:**_", ""),
+    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", calculations['arp']),
+    ("_**Preventive Exposure (e.g. treatment) or when RD is -:**_", ""),
+    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", calculations['pf']),
     ("RRR (Relative Risk Reduction)", calculations['rrr']),
     ("NNT (Number Needed to Treat)", calculations['nnt']),
     ("NNH (Number Needed to Harm)", calculations['nnh']),
@@ -125,4 +125,4 @@ for name, value in measures:
     if value:
         st.write(f"**{name}:** {value}")
     else:
-        st.write(f"**{name}**")
+        st.markdown(f"{name}", unsafe_allow_html=True)
