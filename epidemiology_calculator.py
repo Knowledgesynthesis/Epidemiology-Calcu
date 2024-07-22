@@ -14,15 +14,35 @@ data = {
 
 # Input fields
 st.subheader("2x2 Table")
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
-    data['exposed']['disease'] = st.number_input("Exposed - Disease", value=data['exposed']['disease'])
-    data['exposed']['noDisease'] = st.number_input("Exposed - No Disease", value=data['exposed']['noDisease'])
+    st.write("Exposed")
+    exposed_disease = st.number_input("Disease", value=data['exposed']['disease'])
+    exposed_no_disease = st.number_input("No Disease", value=data['exposed']['noDisease'])
+    total_exposed = exposed_disease + exposed_no_disease
+    st.write(f"Total: {total_exposed}")
 
 with col2:
-    data['unexposed']['disease'] = st.number_input("Unexposed - Disease", value=data['unexposed']['disease'])
-    data['unexposed']['noDisease'] = st.number_input("Unexposed - No Disease", value=data['unexposed']['noDisease'])
+    st.write("Unexposed")
+    unexposed_disease = st.number_input("Disease ", value=data['unexposed']['disease'])
+    unexposed_no_disease = st.number_input("No Disease ", value=data['unexposed']['noDisease'])
+    total_unexposed = unexposed_disease + unexposed_no_disease
+    st.write(f"Total: {total_unexposed}")
+
+# Calculate totals
+total_disease = exposed_disease + unexposed_disease
+total_no_disease = exposed_no_disease + unexposed_no_disease
+grand_total = total_exposed + total_unexposed
+
+st.write("## Table Summary")
+table_data = pd.DataFrame({
+    '': ['Exposed', 'Unexposed', 'Total'],
+    'Disease': [exposed_disease, unexposed_disease, total_disease],
+    'No Disease': [exposed_no_disease, unexposed_no_disease, total_no_disease],
+    'Total': [total_exposed, total_unexposed, grand_total]
+})
+st.table(table_data)
 
 def calculate_measures(data):
     a = data['exposed']['disease']
@@ -65,6 +85,12 @@ def calculate_measures(data):
         'incidence_unexposed': incidence_unexposed * 100,
     }
 
+# Update data dictionary with user inputs
+data['exposed']['disease'] = exposed_disease
+data['exposed']['noDisease'] = exposed_no_disease
+data['unexposed']['disease'] = unexposed_disease
+data['unexposed']['noDisease'] = unexposed_no_disease
+
 calculations = calculate_measures(data)
 
 def format_number(num):
@@ -89,13 +115,13 @@ st.subheader("Key Measures")
 measures = [
     ("RR (Relative Risk)", calculations['rr']),
     ("OR (Odds Ratio)", calculations['or']),
-    ("ARR (Absolute Risk Reduction)", calculations['arr']),
-    ("RRR (Relative Risk Reduction)", calculations['rrr']),
-    ("NNT (Number Needed to Treat)", calculations['nnt']),
-    ("NNH (Number Needed to Harm)", calculations['nnh']),
-    ("AR% (Attributable Risk Percent)", calculations['arp']),
-    ("PF (Preventive Fraction)", calculations['pf']),
+    ("ARR (Absolute Risk Reduction)", f"{format_number(calculations['arr'])}%"),
+    ("RRR (Relative Risk Reduction)", f"{format_number(calculations['rrr'])}%"),
+    ("NNT (Number Needed to Treat)", format_number(calculations['nnt'])),
+    ("NNH (Number Needed to Harm)", format_number(calculations['nnh'])),
+    ("AR% (Attributable Risk Percent)", f"{format_number(calculations['arp'])}%"),
+    ("PF (Preventive Fraction)", f"{format_number(calculations['pf'])}%"),
 ]
 
 for name, value in measures:
-    st.write(f"**{name}:** {format_number(value)}")
+    st.write(f"**{name}:** {value}")
