@@ -65,12 +65,12 @@ def calculate_measures(data):
     or_ratio = (a * d) / (b * c)
     rr = incidence_exposed / incidence_unexposed
     rd = incidence_exposed - incidence_unexposed
-    arr = -rd
-    arp = (rr - 1) / rr * 100
-    pf = (1 - rr) * 100
-    rrr = (1 - rr) * 100
-    nnt = 1 / np.abs(rd) if rd != 0 else np.inf
-    nnh = -nnt if rd != 0 else np.inf
+    arr = incidence_unexposed - incidence_exposed  # Corrected
+    arp = ((rr - 1) / rr) * 100 if rr != 0 else np.inf
+    pf = (1 - rr) * 100 if rr != 0 else np.inf
+    rrr = (1 - rr) * 100 if rr != 0 else np.inf
+    nnt = 1 / np.abs(arr) if arr != 0 else np.inf  # Corrected
+    nnh = -1 / arr if arr != 0 else np.inf  # Corrected
 
     return {
         'or': round(or_ratio, 3), 
@@ -107,21 +107,24 @@ st.altair_chart(bar_chart, use_container_width=True)
 
 st.subheader("Key Measures")
 measures = [
-    ("RR (Relative Risk)", calculations['rr']),
-    ("OR (Odds Ratio)", calculations['or']),
-    ("RD (Risk Difference)", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
-    ("ARR (Absolute Risk Reduction)", calculations['arr']),
-    ("_**Harmful Exposure (e.g. risk factor) or when RD is +:**_", ""),
-    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", calculations['arp']),
-    ("_**Preventive Exposure (e.g. treatment) or when RD is -:**_", ""),
-    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", calculations['pf']),
-    ("RRR (Relative Risk Reduction)", calculations['rrr']),
-    ("NNT (Number Needed to Treat)", calculations['nnt']),
-    ("NNH (Number Needed to Harm)", calculations['nnh']),
+    ("OR (Odds Ratio)", "OR = (a * d) / (b * c)", calculations['or']),
+    ("RR (Relative Risk)", "RR = (a / (a + b)) / (c / (c + d))", calculations['rr']),
+    ("RD (Risk Difference)", "RD = (a / (a + b)) - (c / (c + d))", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
+    ("ARR (Absolute Risk Reduction)", "ARR = (c / (c + d)) - (a / (a + b))", calculations['arr']),
+    ("**_Harmful Exposure (e.g. risk factor) or when RD is +:_**", "", ""),
+    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", "AR% = ((RR - 1) / RR) * 100", calculations['arp']),
+    ("**_Preventive Exposure (e.g. treatment) or when RD is -:_**", "", ""),
+    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", "PF = (1 - RR) * 100", calculations['pf']),
+    ("RRR (Relative Risk Reduction)", "RRR = (1 - RR) * 100", calculations['rrr']),
+    ("NNT (Number Needed to Treat)", "NNT = 1 / |ARR|", calculations['nnt']),
+    ("NNH (Number Needed to Harm)", "NNH = -1 / ARR", calculations['nnh']),
 ]
 
 for measure in measures:
-    if len(measure) == 2:
-        st.markdown(f"**{measure[0]}**: {measure[1]}", unsafe_allow_html=True)
+    if len(measure) == 3:
+        st.markdown(f"**{measure[0]}**:")
+        st.markdown(f"Formula: {measure[1]}")
+        st.markdown(f"Value: {measure[2]}")
     else:
-        st.markdown(f"**{measure[0]}**: {measure[1]}", unsafe_allow_html=True)
+        st.markdown(f"{measure[0]}", unsafe_allow_html=True)
+    st.write("")  # Add a blank line for spacing
