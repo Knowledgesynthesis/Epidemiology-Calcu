@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 import altair as alt
 
-st.set_page_config(layout="wide")
+# Set page layout to centered
+st.set_page_config(layout="centered")
 st.title("Epidemiology Calculator")
 
 # Default data
@@ -15,43 +16,40 @@ data = {
 # Input fields in table layout
 st.subheader("2x2 Table")
 
-table_col1, table_col2, table_col3, table_col4 = st.columns([1, 1, 1, 1])
-
-with table_col1:
-    st.write("")
-    st.write("Exposed")
-    st.write("Unexposed")
+# Create columns to center the input and table summary
+table_col1, table_col2, table_col3 = st.columns([1, 2, 1])
 
 with table_col2:
-    st.write("Disease")
-    data['exposed']['disease'] = st.number_input("Exposed - Disease", value=data['exposed']['disease'], key="exposed_disease")
-    data['unexposed']['disease'] = st.number_input("Unexposed - Disease", value=data['unexposed']['disease'], key="unexposed_disease")
+    st.write("")
+    st.write("Exposed/Treated")
+    st.write("Unexposed/Control")
 
-with table_col3:
-    st.write("No Disease")
-    data['exposed']['noDisease'] = st.number_input("Exposed - No Disease", value=data['exposed']['noDisease'], key="exposed_no_disease")
-    data['unexposed']['noDisease'] = st.number_input("Unexposed - No Disease", value=data['unexposed']['noDisease'], key="unexposed_no_disease")
+with table_col2:
+    st.write("### Input Table")
+    st.write("")
 
-with table_col4:
-    st.write("Total")
+    data['exposed']['disease'] = st.number_input("Exposed/Treated - Disease", value=data['exposed']['disease'], key="exposed_disease")
+    data['exposed']['noDisease'] = st.number_input("Exposed/Treated - No Disease", value=data['exposed']['noDisease'], key="exposed_no_disease")
+    data['unexposed']['disease'] = st.number_input("Unexposed/Control - Disease", value=data['unexposed']['disease'], key="unexposed_disease")
+    data['unexposed']['noDisease'] = st.number_input("Unexposed/Control - No Disease", value=data['unexposed']['noDisease'], key="unexposed_no_disease")
+
+    # Calculate totals for each row
     total_exposed = data['exposed']['disease'] + data['exposed']['noDisease']
     total_unexposed = data['unexposed']['disease'] + data['unexposed']['noDisease']
-    st.write(total_exposed)
-    st.write(total_unexposed)
 
-# Calculate column totals
-total_disease = data['exposed']['disease'] + data['unexposed']['disease']
-total_no_disease = data['exposed']['noDisease'] + data['unexposed']['noDisease']
-grand_total = total_exposed + total_unexposed
+    # Calculate column totals
+    total_disease = data['exposed']['disease'] + data['unexposed']['disease']
+    total_no_disease = data['exposed']['noDisease'] + data['unexposed']['noDisease']
+    grand_total = total_exposed + total_unexposed
 
-st.write("### Table Summary")
-table_data = pd.DataFrame({
-    '': ['Exposed', 'Unexposed', 'Total'],
-    'Disease': [data['exposed']['disease'], data['unexposed']['disease'], total_disease],
-    'No Disease': [data['exposed']['noDisease'], data['unexposed']['noDisease'], total_no_disease],
-    'Total': [total_exposed, total_unexposed, grand_total]
-})
-st.table(table_data)
+    st.write("### Table Summary")
+    table_data = pd.DataFrame({
+        '': ['Exposed/Treated', 'Unexposed/Control', 'Total'],
+        'Disease': [data['exposed']['disease'], data['unexposed']['disease'], total_disease],
+        'No Disease': [data['exposed']['noDisease'], data['unexposed']['noDisease'], total_no_disease],
+        'Total': [total_exposed, total_unexposed, grand_total]
+    })
+    st.table(table_data)
 
 def calculate_measures(data):
     a = data['exposed']['disease']
@@ -127,3 +125,7 @@ measures = [
 
 for name, value in measures:
     st.write(f"**{name}:** {value}")
+
+st.write("**Harmful Exposure (e.g. risk factor) or when RD is +**")
+st.write("**Preventive Exposure (e.g. treatment) or when RD is -**")
+st.write("**(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure**")
