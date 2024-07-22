@@ -15,36 +15,43 @@ data = {
 # Input fields in table layout
 st.subheader("2x2 Table")
 
-table_col1, table_col2 = st.columns([2, 1])
+table_col1, table_col2, table_col3, table_col4 = st.columns([1, 1, 1, 1])
 
 with table_col1:
-    st.write("### Input Table")
     st.write("")
-    st.write("")
-
-    data['exposed']['disease'] = st.number_input("Exposed - Disease", value=data['exposed']['disease'], key="exposed_disease", format="%d", step=1, min_value=0)
-    data['exposed']['noDisease'] = st.number_input("Exposed - No Disease", value=data['exposed']['noDisease'], key="exposed_no_disease", format="%d", step=1, min_value=0)
-    data['unexposed']['disease'] = st.number_input("Unexposed - Disease", value=data['unexposed']['disease'], key="unexposed_disease", format="%d", step=1, min_value=0)
-    data['unexposed']['noDisease'] = st.number_input("Unexposed - No Disease", value=data['unexposed']['noDisease'], key="unexposed_no_disease", format="%d", step=1, min_value=0)
-
-    # Calculate totals for each row
-    total_exposed = data['exposed']['disease'] + data['exposed']['noDisease']
-    total_unexposed = data['unexposed']['disease'] + data['unexposed']['noDisease']
-
-    # Calculate column totals
-    total_disease = data['exposed']['disease'] + data['unexposed']['disease']
-    total_no_disease = data['exposed']['noDisease'] + data['unexposed']['noDisease']
-    grand_total = total_exposed + total_unexposed
+    st.write("Exposed")
+    st.write("Unexposed")
 
 with table_col2:
-    st.write("### Table Summary")
-    table_data = pd.DataFrame({
-        '': ['Exposed', 'Unexposed', 'Total'],
-        'Disease': [data['exposed']['disease'], data['unexposed']['disease'], total_disease],
-        'No Disease': [data['exposed']['noDisease'], data['unexposed']['noDisease'], total_no_disease],
-        'Total': [total_exposed, total_unexposed, grand_total]
-    })
-    st.table(table_data)
+    st.write("Disease")
+    data['exposed']['disease'] = st.number_input("Exposed - Disease", value=data['exposed']['disease'], key="exposed_disease")
+    data['unexposed']['disease'] = st.number_input("Unexposed - Disease", value=data['unexposed']['disease'], key="unexposed_disease")
+
+with table_col3:
+    st.write("No Disease")
+    data['exposed']['noDisease'] = st.number_input("Exposed - No Disease", value=data['exposed']['noDisease'], key="exposed_no_disease")
+    data['unexposed']['noDisease'] = st.number_input("Unexposed - No Disease", value=data['unexposed']['noDisease'], key="unexposed_no_disease")
+
+with table_col4:
+    st.write("Total")
+    total_exposed = data['exposed']['disease'] + data['exposed']['noDisease']
+    total_unexposed = data['unexposed']['disease'] + data['unexposed']['noDisease']
+    st.write(total_exposed)
+    st.write(total_unexposed)
+
+# Calculate column totals
+total_disease = data['exposed']['disease'] + data['unexposed']['disease']
+total_no_disease = data['exposed']['noDisease'] + data['unexposed']['noDisease']
+grand_total = total_exposed + total_unexposed
+
+st.write("### Table Summary")
+table_data = pd.DataFrame({
+    '': ['Exposed', 'Unexposed', 'Total'],
+    'Disease': [data['exposed']['disease'], data['unexposed']['disease'], total_disease],
+    'No Disease': [data['exposed']['noDisease'], data['unexposed']['noDisease'], total_no_disease],
+    'Total': [total_exposed, total_unexposed, grand_total]
+})
+st.table(table_data)
 
 def calculate_measures(data):
     a = data['exposed']['disease']
