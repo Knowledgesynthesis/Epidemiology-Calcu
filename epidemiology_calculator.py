@@ -66,11 +66,11 @@ def calculate_measures(data):
     rr = incidence_exposed / incidence_unexposed if incidence_unexposed != 0 else np.inf
     rd = incidence_exposed - incidence_unexposed
     arr = incidence_unexposed - incidence_exposed
-    arp = (incidence_exposed - incidence_unexposed) / incidence_exposed * 100 if incidence_exposed != 0 else np.inf
-    pf = (incidence_unexposed - incidence_exposed) / incidence_unexposed * 100 if incidence_unexposed != 0 else np.inf
-    rrr = (1 - rr) * 100 if rr != np.inf else np.inf
+    arp = (incidence_exposed - incidence_unexposed) / incidence_exposed if incidence_exposed != 0 else np.inf
+    pf = (incidence_unexposed - incidence_exposed) / incidence_unexposed if incidence_unexposed != 0 else np.inf
+    rrr = (1 - rr) if rr != np.inf else np.inf
     nnt = 1 / np.abs(arr) if arr != 0 else np.inf
-    nnh = 1 / np.abs(arr) if arr != 0 else np.inf
+    nnh = -1 / np.abs(arr) if arr != 0 else np.inf
 
     return {
         'or': round(or_ratio, 3), 
