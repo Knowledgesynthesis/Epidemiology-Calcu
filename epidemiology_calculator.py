@@ -85,17 +85,6 @@ def calculate_measures(data):
         'incidence': round(incidence * 100, 3),
         'incidence_exposed': round(incidence_exposed * 100, 3),
         'incidence_unexposed': round(incidence_unexposed * 100, 3),
-        'formulas': {
-            'or': f"(a * d) / (b * c) = ({a} * {d}) / ({b} * {c}) = {round(or_ratio, 3)}",
-            'rr': f"incidence_exposed / incidence_unexposed = {round(incidence_exposed, 3)} / {round(incidence_unexposed, 3)} = {round(rr, 3)}",
-            'rd': f"incidence_exposed - incidence_unexposed = {round(incidence_exposed, 3)} - {round(incidence_unexposed, 3)} = {round(rd, 3)}",
-            'arr': f"-rd = {-round(rd, 3)}",
-            'arp': f"(rr - 1) / rr * 100 = ({round(rr, 3)} - 1) / {round(rr, 3)} * 100 = {round(arp, 3)}",
-            'pf': f"(1 - rr) * 100 = (1 - {round(rr, 3)}) * 100 = {round(pf, 3)}",
-            'rrr': f"(1 - rr) * 100 = (1 - {round(rr, 3)}) * 100 = {round(rrr, 3)}",
-            'nnt': f"1 / |rd| = 1 / |{round(rd, 3)}| = {round(nnt, 3) if nnt != np.inf else '∞'}",
-            'nnh': f"-nnt = {-round(nnt, 3) if nnt != np.inf else '∞'}",
-        }
     }
 
 # Update data dictionary with user inputs
@@ -118,25 +107,21 @@ st.altair_chart(bar_chart, use_container_width=True)
 
 st.subheader("Key Measures")
 measures = [
-    ("RR (Relative Risk)", calculations['rr'], calculations['formulas']['rr']),
-    ("OR (Odds Ratio)", calculations['or'], calculations['formulas']['or']),
-    ("RD (Risk Difference)", calculations['rd'], calculations['formulas']['rd'], " { (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }"),
-    ("ARR (Absolute Risk Reduction)", calculations['arr'], calculations['formulas']['arr']),
-    ("_**Harmful Exposure (e.g. risk factor) or when RD is +:**_", "", ""),
-    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", calculations['arp'], calculations['formulas']['arp']),
-    ("_**Preventive Exposure (e.g. treatment) or when RD is -:**_", "", ""),
-    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", calculations['pf'], calculations['formulas']['pf']),
-    ("RRR (Relative Risk Reduction)", calculations['rrr'], calculations['formulas']['rrr']),
-    ("NNT (Number Needed to Treat)", calculations['nnt'], calculations['formulas']['nnt']),
-    ("NNH (Number Needed to Harm)", calculations['nnh'], calculations['formulas']['nnh']),
+    ("RR (Relative Risk)", calculations['rr']),
+    ("OR (Odds Ratio)", calculations['or']),
+    ("RD (Risk Difference)", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
+    ("ARR (Absolute Risk Reduction)", calculations['arr']),
+    ("_**Harmful Exposure (e.g. risk factor) or when RD is +:**_", ""),
+    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", calculations['arp']),
+    ("_**Preventive Exposure (e.g. treatment) or when RD is -:**_", ""),
+    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", calculations['pf']),
+    ("RRR (Relative Risk Reduction)", calculations['rrr']),
+    ("NNT (Number Needed to Treat)", calculations['nnt']),
+    ("NNH (Number Needed to Harm)", calculations['nnh']),
 ]
 
 for measure in measures:
-    if len(measure) == 3:
-        st.write(f"**{measure[0]}**: {measure[1]}")
-        st.write(f"*Formula:* {measure[2]}")
-    elif len(measure) == 4:
-        st.write(f"**{measure[0]}**: {measure[1]}{measure[3]}")
-        st.write(f"*Formula:* {measure[2]}")
+    if len(measure) == 2:
+        st.markdown(f"**{measure[0]}**: {measure[1]}", unsafe_allow_html=True)
     else:
-        st.markdown(measure[0], unsafe_allow_html=True)
+        st.markdown(f"**{measure[0]}**: {measure[1]}", unsafe_allow_html=True)
