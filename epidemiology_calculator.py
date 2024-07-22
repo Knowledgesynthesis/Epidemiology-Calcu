@@ -58,19 +58,19 @@ def calculate_measures(data):
     total_no_disease = b + d
     total = total_exposed + total_unexposed
 
-    incidence_exposed = a / total_exposed
-    incidence_unexposed = c / total_unexposed
-    incidence = total_disease / total
+    incidence_exposed = a / total_exposed if total_exposed != 0 else 0
+    incidence_unexposed = c / total_unexposed if total_unexposed != 0 else 0
+    incidence = total_disease / total if total != 0 else 0
 
-    or_ratio = (a * d) / (b * c)
-    rr = incidence_exposed / incidence_unexposed
+    or_ratio = (a * d) / (b * c) if b * c != 0 else np.inf
+    rr = incidence_exposed / incidence_unexposed if incidence_unexposed != 0 else np.inf
     rd = incidence_exposed - incidence_unexposed
-    arr = incidence_unexposed - incidence_exposed  # Corrected
-    arp = ((rr - 1) / rr) * 100 if rr != 0 else np.inf
-    pf = (1 - rr) * 100 if rr != 0 else np.inf
-    rrr = (1 - rr) * 100 if rr != 0 else np.inf
-    nnt = 1 / np.abs(arr) if arr != 0 else np.inf  # Corrected
-    nnh = -1 / arr if arr != 0 else np.inf  # Corrected
+    arr = incidence_unexposed - incidence_exposed
+    arp = (incidence_exposed - incidence_unexposed) / incidence_exposed * 100 if incidence_exposed != 0 else np.inf
+    pf = (incidence_unexposed - incidence_exposed) / incidence_unexposed * 100 if incidence_unexposed != 0 else np.inf
+    rrr = (1 - rr) * 100 if rr != np.inf else np.inf
+    nnt = 1 / np.abs(arr) if arr != 0 else np.inf
+    nnh = 1 / np.abs(arr) if arr != 0 else np.inf
 
     return {
         'or': round(or_ratio, 3), 
@@ -110,15 +110,21 @@ measures = [
     ("OR (Odds Ratio)", "OR = (a * d) / (b * c)", calculations['or']),
     ("RR (Relative Risk)", "RR = (a / (a + b)) / (c / (c + d))", calculations['rr']),
     ("RD (Risk Difference)", "RD = (a / (a + b)) - (c / (c + d))", f"{calculations['rd']}      <span style='color:grey; font-size:small;'>{{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}</span>"),
-    ("ARR (Absolute Risk Reduction)", "ARR = (c / (c + d)) - (a / (a + b))", calculations['arr']),
-    ("**_Harmful Exposure (e.g. risk factor) or when RD is +:_**", "", ""),
-    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", "AR% = ((RR - 1) / RR) * 100", calculations['arp']),
-    ("**_Preventive Exposure (e.g. treatment) or when RD is -:_**", "", ""),
-    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", "PF = (1 - RR) * 100", calculations['pf']),
-    ("RRR (Relative Risk Reduction)", "RRR = (1 - RR) * 100", calculations['rrr']),
-    ("NNT (Number Needed to Treat)", "NNT = 1 / |ARR|", calculations['nnt']),
-    ("NNH (Number Needed to Harm)", "NNH = -1 / ARR", calculations['nnh']),
+    ("ARR (Absolute Risk Reduction)", "ARR = H5 - H4", calculations['arr']),
+    ("***Harmful Exposure (e.g. risk factor) or when RD is +:***", "", ""),
+    ("&nbsp;&nbsp;&nbsp;AR% (Attributable Risk Percent)", "ARP = (H4 - H5) / H4", calculations['arp']),
+    ("***Preventive Exposure (e.g. treatment) or when RD is -:***", "", ""),
+    ("&nbsp;&nbsp;&nbsp;PF (Preventive Fraction)", "PF = (H5 - H4) / H5", calculations['pf']),
+    ("RRR (Relative Risk Reduction)", "RRR = 1 - H6", calculations['rrr']),
+    ("***Number needed to treat (NNT)***", "NNT = 1 / (H5 - H4)", calculations['nnt']),
+    ("***Number needed to harm (NNH)***", "NNH = 1 / (H4 - H5)", calculations['nnh']),
 ]
+
+st.markdown("***where:***")
+st.markdown("***H4 = Incidence among exposed***")
+st.markdown("***H5 = Incidence among unexposed***")
+st.markdown("***H6 = Relative Risk / Risk Ratio (RR)***")
+st.write("")
 
 for measure in measures:
     if len(measure) == 3:
