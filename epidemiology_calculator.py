@@ -194,7 +194,7 @@ def create_decision_aid_figure(rd, total=100):
             else:
                 data.append({'index': i, 'Condition': 'No Benefit', 'x': i % 10, 'y': i // 10})
         df = pd.DataFrame(data)
-        color_scale = alt.Scale(domain=['Base Benefit', 'Additional Benefit', 'No Benefit'], range=['#0000FF', '#00FF00', '#FF0000'])
+        color_scale = alt.Scale(domain=['Base Benefit', 'Additional Benefit', 'No Benefit'], range=['#ADD8E6', '#00FF00', '#FF0000'])
 
     chart = alt.Chart(df).mark_circle(size=100).encode(
         x=alt.X('x:O', axis=None),
