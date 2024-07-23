@@ -165,6 +165,53 @@ st.write("**α _(+) RD indicates a harmful exposure, (-) RD indicates a preventi
 st.write("**β _Harmful Exposure (e.g. risk factor) or when RD is +_**")
 st.write("**γ _Preventive Exposure (e.g. treatment) or when RD is -_**")
 
+# Decision aid figure based on RD
+def create_decision_aid_figure(rd, total=100):
+    if rd > 0:
+        base_risk = round((1 - rd) * total)
+        additional_risk = round(rd * total)
+        no_risk = total - base_risk - additional_risk
+        data = []
+        for i in range(total):
+            if i < base_risk:
+                data.append({'index': i, 'Condition': 'Base Risk', 'x': i % 10, 'y': i // 10})
+            elif i < base_risk + additional_risk:
+                data.append({'index': i, 'Condition': 'Additional Risk', 'x': i % 10, 'y': i // 10})
+            else:
+                data.append({'index': i, 'Condition': 'No Risk', 'x': i % 10, 'y': i // 10})
+        df = pd.DataFrame(data)
+        color_scale = alt.Scale(domain=['Base Risk', 'Additional Risk', 'No Risk'], range=['#FFD700', '#FF0000', '#00FF00'])
+    else:
+        base_benefit = round((1 + rd) * total)
+        additional_benefit = round(-rd * total)
+        no_benefit = total - base_benefit - additional_benefit
+        data = []
+        for i in range(total):
+            if i < base_benefit:
+                data.append({'index': i, 'Condition': 'Base Benefit', 'x': i % 10, 'y': i // 10})
+            elif i < base_benefit + additional_benefit:
+                data.append({'index': i, 'Condition': 'Additional Benefit', 'x': i % 10, 'y': i // 10})
+            else:
+                data.append({'index': i, 'Condition': 'No Benefit', 'x': i % 10, 'y': i // 10})
+        df = pd.DataFrame(data)
+        color_scale = alt.Scale(domain=['Base Benefit', 'Additional Benefit', 'No Benefit'], range=['#0000FF', '#00FF00', '#FF0000'])
+
+    chart = alt.Chart(df).mark_circle(size=100).encode(
+        x=alt.X('x:O', axis=None),
+        y=alt.Y('y:O', axis=None, sort='descending'),
+        color=alt.Color('Condition:N', scale=color_scale)
+    ).properties(
+        width=300,
+        height=300
+    ).configure_axis(
+        grid=False
+    ).configure_view(
+        strokeWidth=0
+    )
+    st.altair_chart(chart)
+
+create_decision_aid_figure(calculations['rd'])
+
 # Footer
 st.markdown("""
     <div style="text-align: center; margin-top: 50px; padding: 10px; background-color: #0E1117; color: white;">
