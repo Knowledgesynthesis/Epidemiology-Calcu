@@ -82,11 +82,13 @@ def calculate_measures(data):
     rr_ci_low = np.exp(np.log(rr) - 1.96 * rr_se)
     rr_ci_high = np.exp(np.log(rr) + 1.96 * rr_se)
 
-    # Calculate 95% CI for RD
+    # Calculate 95% CI for RD and ARR
     rd_se = np.sqrt((incidence_exposed * (1 - incidence_exposed) / total_exposed) +
                     (incidence_unexposed * (1 - incidence_unexposed) / total_unexposed))
     rd_ci_low = rd - 1.96 * rd_se
     rd_ci_high = rd + 1.96 * rd_se
+    arr_ci_low = arr - 1.96 * rd_se
+    arr_ci_high = arr + 1.96 * rd_se
 
     # Calculate 95% CI for ARP, PF, RRR, NNT, NNH if possible
     arp_ci_low, arp_ci_high = (np.inf, np.inf) if arp == np.inf else (arp - 1.96 * rd_se, arp + 1.96 * rd_se)
@@ -108,6 +110,7 @@ def calculate_measures(data):
         'or_ci': (round(or_ci_low, 3), round(or_ci_high, 3)),
         'rr_ci': (round(rr_ci_low, 3), round(rr_ci_high, 3)),
         'rd_ci': (round(rd_ci_low, 3), round(rd_ci_high, 3)),
+        'arr_ci': (round(arr_ci_low, 3), round(arr_ci_high, 3)),
         'arp_ci': (round(arp_ci_low, 3), round(arp_ci_high, 3)),
         'pf_ci': (round(pf_ci_low, 3), round(pf_ci_high, 3)),
         'rrr_ci': (round(rrr_ci_low, 3), round(rrr_ci_high, 3)),
@@ -139,26 +142,26 @@ st.altair_chart(bar_chart, use_container_width=True)
 # Display key measures in a table
 st.subheader("Key Measures")
 key_measures = pd.DataFrame({
-    'Measure': ['OR (Odds Ratio)', 'RR (Relative Risk)', 'RD (Risk Difference)*', 'ARR (Absolute Risk Reduction)',
-                'AR% (Attributable Risk Percent)**', 'PF (Preventive Fraction)***', 'RRR (Relative Risk Reduction)',
+    'Measure': ['OR (Odds Ratio)', 'RR (Relative Risk)', 'RD (Risk Difference)α', 'ARR (Absolute Risk Reduction)',
+                'AR% (Attributable Risk Percent)β', 'PF (Preventive Fraction)γ', 'RRR (Relative Risk Reduction)',
                 'NNT (Number Needed to Treat)', 'NNH (Number Needed to Harm)'],
     'Value': [calculations['or'], calculations['rr'], calculations['rd'], calculations['arr'],
               calculations['arp'], calculations['pf'], calculations['rrr'], calculations['nnt'], calculations['nnh']],
     '95% CI': [f"({calculations['or_ci'][0]}, {calculations['or_ci'][1]})", 
                f"({calculations['rr_ci'][0]}, {calculations['rr_ci'][1]})",
                f"({calculations['rd_ci'][0]}, {calculations['rd_ci'][1]})", 
-               f"({calculations['arr_ci'][0]}, {calculations['arr_ci'][1]})" if 'arr_ci' in calculations else '',
-               f"({calculations['arp_ci'][0]}, {calculations['arp_ci'][1]})" if 'arp_ci' in calculations else '',
-               f"({calculations['pf_ci'][0]}, {calculations['pf_ci'][1]})" if 'pf_ci' in calculations else '',
-               f"({calculations['rrr_ci'][0]}, {calculations['rrr_ci'][1]})" if 'rrr_ci' in calculations else '',
-               f"({calculations['nnt_ci'][0]}, {calculations['nnt_ci'][1]})" if 'nnt_ci' in calculations else '',
-               f"({calculations['nnh_ci'][0]}, {calculations['nnh_ci'][1]})" if 'nnh_ci' in calculations else '']
+               f"({calculations['arr_ci'][0]}, {calculations['arr_ci'][1]})",
+               f"({calculations['arp_ci'][0]}, {calculations['arp_ci'][1]})",
+               f"({calculations['pf_ci'][0]}, {calculations['pf_ci'][1]})",
+               f"({calculations['rrr_ci'][0]}, {calculations['rrr_ci'][1]})",
+               f"({calculations['nnt_ci'][0]}, {calculations['nnt_ci'][1]})",
+               f"({calculations['nnh_ci'][0]}, {calculations['nnh_ci'][1]})"]
 })
 
 st.table(key_measures)
 
 # Additional explanatory notes
-st.write("***_(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure_***")
-st.write("**_Harmful Exposure (e.g. risk factor) or when RD is +_**")
-st.write("**_Preventive Exposure (e.g. treatment) or when RD is -_**")
+st.write("**α _(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure_**")
+st.write("**β _Harmful Exposure (e.g. risk factor) or when RD is +_**")
+st.write("**γ _Preventive Exposure (e.g. treatment) or when RD is -_**")
 
