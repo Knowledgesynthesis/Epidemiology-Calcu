@@ -88,6 +88,13 @@ def calculate_measures(data):
     rd_ci_low = rd - 1.96 * rd_se
     rd_ci_high = rd + 1.96 * rd_se
 
+    # Calculate 95% CI for ARP, PF, RRR, NNT, NNH if possible
+    arp_ci_low, arp_ci_high = (np.inf, np.inf) if arp == np.inf else (arp - 1.96 * rd_se, arp + 1.96 * rd_se)
+    pf_ci_low, pf_ci_high = (np.inf, np.inf) if pf == np.inf else (pf - 1.96 * rd_se, pf + 1.96 * rd_se)
+    rrr_ci_low, rrr_ci_high = (np.inf, np.inf) if rrr == np.inf else (rrr - 1.96 * rr_se, rrr + 1.96 * rr_se)
+    nnt_ci_low, nnt_ci_high = (np.inf, np.inf) if nnt == np.inf else (nnt - 1.96 * abs(1 / (arr * np.sqrt(total_unexposed))), nnt + 1.96 * abs(1 / (arr * np.sqrt(total_unexposed))))
+    nnh_ci_low, nnh_ci_high = (np.inf, np.inf) if nnh == np.inf else (nnh - 1.96 * abs(1 / (arr * np.sqrt(total_unexposed))), nnh + 1.96 * abs(1 / (arr * np.sqrt(total_unexposed))))
+
     return {
         'or': round(or_ratio, 3), 
         'rr': round(rr, 3), 
@@ -101,6 +108,11 @@ def calculate_measures(data):
         'or_ci': (round(or_ci_low, 3), round(or_ci_high, 3)),
         'rr_ci': (round(rr_ci_low, 3), round(rr_ci_high, 3)),
         'rd_ci': (round(rd_ci_low, 3), round(rd_ci_high, 3)),
+        'arp_ci': (round(arp_ci_low, 3), round(arp_ci_high, 3)),
+        'pf_ci': (round(pf_ci_low, 3), round(pf_ci_high, 3)),
+        'rrr_ci': (round(rrr_ci_low, 3), round(rrr_ci_high, 3)),
+        'nnt_ci': (round(nnt_ci_low, 3), round(nnt_ci_high, 3)),
+        'nnh_ci': (round(nnh_ci_low, 3), round(nnh_ci_high, 3)),
         'incidence': round(incidence * 100, 3),
         'incidence_exposed': round(incidence_exposed * 100, 3),
         'incidence_unexposed': round(incidence_unexposed * 100, 3),
@@ -127,20 +139,26 @@ st.altair_chart(bar_chart, use_container_width=True)
 # Display key measures in a table
 st.subheader("Key Measures")
 key_measures = pd.DataFrame({
-    'Measure': ['OR (Odds Ratio)', 'RR (Relative Risk)', 'RD (Risk Difference)', 'ARR (Absolute Risk Reduction)',
-                'AR% (Attributable Risk Percent)', 'PF (Preventive Fraction)', 'RRR (Relative Risk Reduction)',
+    'Measure': ['OR (Odds Ratio)', 'RR (Relative Risk)', 'RD (Risk Difference)*', 'ARR (Absolute Risk Reduction)',
+                'AR% (Attributable Risk Percent)**', 'PF (Preventive Fraction)***', 'RRR (Relative Risk Reduction)',
                 'NNT (Number Needed to Treat)', 'NNH (Number Needed to Harm)'],
     'Value': [calculations['or'], calculations['rr'], calculations['rd'], calculations['arr'],
               calculations['arp'], calculations['pf'], calculations['rrr'], calculations['nnt'], calculations['nnh']],
     '95% CI': [f"({calculations['or_ci'][0]}, {calculations['or_ci'][1]})", 
                f"({calculations['rr_ci'][0]}, {calculations['rr_ci'][1]})",
-               f"({calculations['rd_ci'][0]}, {calculations['rd_ci'][1]})", '', '', '', '', '', '']
+               f"({calculations['rd_ci'][0]}, {calculations['rd_ci'][1]})", 
+               f"({calculations['arr_ci'][0]}, {calculations['arr_ci'][1]})" if 'arr_ci' in calculations else '',
+               f"({calculations['arp_ci'][0]}, {calculations['arp_ci'][1]})" if 'arp_ci' in calculations else '',
+               f"({calculations['pf_ci'][0]}, {calculations['pf_ci'][1]})" if 'pf_ci' in calculations else '',
+               f"({calculations['rrr_ci'][0]}, {calculations['rrr_ci'][1]})" if 'rrr_ci' in calculations else '',
+               f"({calculations['nnt_ci'][0]}, {calculations['nnt_ci'][1]})" if 'nnt_ci' in calculations else '',
+               f"({calculations['nnh_ci'][0]}, {calculations['nnh_ci'][1]})" if 'nnh_ci' in calculations else '']
 })
 
 st.table(key_measures)
 
 # Additional explanatory notes
-st.write("**_(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure_**")
+st.write("***_(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure_***")
 st.write("**_Harmful Exposure (e.g. risk factor) or when RD is +_**")
 st.write("**_Preventive Exposure (e.g. treatment) or when RD is -_**")
 
