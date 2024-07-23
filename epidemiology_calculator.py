@@ -165,3 +165,9 @@ st.write("**α _(+) RD indicates a harmful exposure, (-) RD indicates a preventi
 st.write("**β _Harmful Exposure (e.g. risk factor) or when RD is +_**")
 st.write("**γ _Preventive Exposure (e.g. treatment) or when RD is -_**")
 
+# Footer
+st.markdown("""
+    <div style="text-align: center; margin-top: 50px; padding: 10px; background-color: #0E1117; color: white;">
+        Web app made by Bashar Hasan, MD
+    </div>
+""", unsafe_allow_html=True)
