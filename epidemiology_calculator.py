@@ -126,12 +126,11 @@ st.altair_chart(bar_chart, use_container_width=True)
 
 # Display key measures in a table
 st.subheader("Key Measures")
-rd_comment = "      { (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }"
 key_measures = pd.DataFrame({
     'Measure': ['OR (Odds Ratio)', 'RR (Relative Risk)', 'RD (Risk Difference)', 'ARR (Absolute Risk Reduction)',
                 'AR% (Attributable Risk Percent)', 'PF (Preventive Fraction)', 'RRR (Relative Risk Reduction)',
                 'NNT (Number Needed to Treat)', 'NNH (Number Needed to Harm)'],
-    'Value': [calculations['or'], calculations['rr'], f"{calculations['rd']} {rd_comment}", calculations['arr'],
+    'Value': [calculations['or'], calculations['rr'], calculations['rd'], calculations['arr'],
               calculations['arp'], calculations['pf'], calculations['rrr'], calculations['nnt'], calculations['nnh']],
     '95% CI': [f"({calculations['or_ci'][0]}, {calculations['or_ci'][1]})", 
                f"({calculations['rr_ci'][0]}, {calculations['rr_ci'][1]})",
@@ -141,6 +140,7 @@ key_measures = pd.DataFrame({
 st.table(key_measures)
 
 # Additional explanatory notes
+st.write("**_(+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure_**")
 st.write("**_Harmful Exposure (e.g. risk factor) or when RD is +_**")
 st.write("**_Preventive Exposure (e.g. treatment) or when RD is -_**")
 
