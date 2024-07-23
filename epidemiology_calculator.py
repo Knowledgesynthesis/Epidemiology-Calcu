@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import altair as alt
-from scipy.stats import norm
 
 # Set page layout to centered
 st.set_page_config(layout="centered")
@@ -70,8 +69,8 @@ def calculate_measures(data):
     arp = (incidence_exposed - incidence_unexposed) / incidence_exposed if incidence_exposed != 0 else np.inf
     pf = (incidence_unexposed - incidence_exposed) / incidence_unexposed if incidence_unexposed != 0 else np.inf
     rrr = (1 - rr) if rr != np.inf else np.inf
-    nnt = 1 / arr if arr > 0 else np.inf
-    nnh = -1 / arr if arr < 0 else np.inf
+    nnt = 1 / arr if arr != 0 else np.inf
+    nnh = -1 / arr if arr != 0 else np.inf
 
     # Calculate 95% CI for OR
     or_se = np.sqrt(1/a + 1/b + 1/c + 1/d)
@@ -127,17 +126,12 @@ st.altair_chart(bar_chart, use_container_width=True)
 
 # Display key measures in a table
 st.subheader("Key Measures")
+rd_comment = "<span style='color:grey; font-size:small;'>      { (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }</span>"
 key_measures = pd.DataFrame({
     'Measure': ['OR (Odds Ratio)', 'RR (Relative Risk)', 'RD (Risk Difference)', 'ARR (Absolute Risk Reduction)',
                 'AR% (Attributable Risk Percent)', 'PF (Preventive Fraction)', 'RRR (Relative Risk Reduction)',
                 'NNT (Number Needed to Treat)', 'NNH (Number Needed to Harm)'],
-    'Formula': ['OR = (a * d) / (b * c)', 'RR = (Incidence among exposed) / (Incidence among unexposed)', 
-                'RD = (Incidence among exposed) - (Incidence among unexposed)', 'ARR = (Incidence among unexposed) - (Incidence among exposed)',
-                'ARP = [(Incidence among exposed) - (Incidence among unexposed)] / (Incidence among exposed)',
-                'PF = [(Incidence among unexposed) - (Incidence among exposed)] / (Incidence among unexposed)',
-                'RRR = 1 - RR', 'NNT = 1 / [(Incidence among unexposed) - (Incidence among exposed)]',
-                'NNH = 1 / [(Incidence among exposed) - (Incidence among unexposed)]'],
-    'Value': [calculations['or'], calculations['rr'], f"{calculations['rd']}      {{ (+) RD indicates a harmful exposure, (-) RD indicates a preventive exposure }}", calculations['arr'],
+    'Value': [calculations['or'], calculations['rr'], f"{calculations['rd']} {rd_comment}", calculations['arr'],
               calculations['arp'], calculations['pf'], calculations['rrr'], calculations['nnt'], calculations['nnh']],
     '95% CI': [f"({calculations['or_ci'][0]}, {calculations['or_ci'][1]})", 
                f"({calculations['rr_ci'][0]}, {calculations['rr_ci'][1]})",
